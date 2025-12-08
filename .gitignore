@@ -207,7 +207,9 @@ marimo/_lsp/
 __marimo__/
 
 # Project
-logs/
-plugins/
+logs_airflow/
+plugins_airflow/
 data/
-config/
+config_airflow/
+data_ch/
+logs_ch/
