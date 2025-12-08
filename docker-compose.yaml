@@ -49,8 +49,10 @@ x-airflow-common:
   # In order to add custom dependencies or upgrade provider packages you can use your extended image.
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.9.2}
-  # build: .
+  # image: bigdata-project-airflow:2.11.0-trino-minio
+  build: 
+    context: .
+    dockerfile: airflow_dockerfile/Dockerfile
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -74,9 +76,10 @@ x-airflow-common:
     # AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
-    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
-    - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
-    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+    - ${AIRFLOW_PROJ_DIR:-.}/logs_airflow:/opt/airflow/logs
+    - ${AIRFLOW_PROJ_DIR:-.}/config_airflow:/opt/airflow/config
+    - ${AIRFLOW_PROJ_DIR:-.}/plugins_airflow:/opt/airflow/plugins
+    - ${AIRFLOW_PROJ_DIR:-.}/dqc:/opt/airflow/soda
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -102,6 +105,18 @@ services:
       retries: 5
       start_period: 5s
     restart: always
+
+  clickhouse-server:
+    image: clickhouse/clickhouse-server:24.3.6
+    container_name: clickhouse-server
+    ports:
+        - '8123:8123'
+        - '9005:9000'
+    volumes:
+      - ./data_ch:/var/lib/clickhouse
+      - ./logs_ch:/var/log/clickhouse-server
+      - ./config_ch/users.xml:/etc/clickhouse-server/users.d/my_user.xml
+
 
   minio:
     image: minio/minio:RELEASE.2025-02-18T16-25-55Z
@@ -220,6 +235,9 @@ services:
       POSTGRES_DB: dwh
     ports:
       - "5434:5432"
+    volumes:
+      - ./init_scripts:/docker-entrypoint-initdb.d
+      - postgres-db-volume_dwh:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U dwh -d dwh"]
       interval: 10s
@@ -413,4 +431,5 @@ volumes:
   postgres-db-volume:
   minio-storage:
   minio-config:
+  postgres-db-volume_dwh:
 

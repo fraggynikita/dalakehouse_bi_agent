@@ -1,0 +1,7 @@
+data_source trino_dlh:
+    type: trino
+    host: trino
+    port: 8080
+    username: user
+    password: ""
+    http_scheme: http
