@@ -209,6 +209,8 @@ __marimo__/
 # Project
 logs/
 plugins/
+logs_airflow/
+plugins_airflow/
 data/
 config/
 data/

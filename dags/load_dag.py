@@ -34,10 +34,10 @@ def create_trino_conn():
 
 with DAG(
     dag_id="example_trino",
-    schedule_interval='@once',  # Override to match your needs
+    schedule_interval='@once',  
     start_date=datetime(2022, 1, 1),
     catchup=False,
-    tags=["example"],
+    tags=["test"],
 ) as dag:
     
     create_connection = PythonOperator(

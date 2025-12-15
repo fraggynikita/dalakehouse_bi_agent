@@ -1,0 +1,7 @@
+CREATE SCHEMA IF NOT EXISTS test;
+
+CREATE TABLE IF NOT EXISTS test.test_table (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    role VARCHAR(50) NOT NULL
+);
