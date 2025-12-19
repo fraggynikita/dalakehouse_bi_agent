@@ -214,3 +214,8 @@ plugins_airflow/
 data/
 config/
 data/
+jars/
+dags/raw_data/
+logs_ch/
+data_ch/
+config_ch/

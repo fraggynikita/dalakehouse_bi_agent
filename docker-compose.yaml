@@ -49,10 +49,10 @@ x-airflow-common:
   # In order to add custom dependencies or upgrade provider packages you can use your extended image.
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  # image: bigdata-project-airflow:2.11.0-trino-minio
-  build: 
-    context: .
-    dockerfile: airflow_dockerfile/Dockerfile
+  image: bigdata-project-airflow:2.11.0
+  # build: 
+  #   context: .
+  #   dockerfile: airflow_dockerfile/Dockerfile
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -116,13 +116,15 @@ services:
       - ./data_ch:/var/lib/clickhouse
       - ./logs_ch:/var/log/clickhouse-server
       - ./config_ch/users.xml:/etc/clickhouse-server/users.d/my_user.xml
+      - ./config_ch/gigachat_best_llm.txt:/etc/clickhouse-server/users.d/gigachat_best_llm.txt
 
 
   minio:
     image: minio/minio:RELEASE.2025-02-18T16-25-55Z
     restart: always
     volumes:
-      - ./data:/data
+      - minio-storage:/data
+      # - minio-storage:/data
     environment:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin
@@ -145,11 +147,10 @@ services:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin
     volumes:
-      - ./data:/data
+      - minio-storage:/data
     entrypoint: >
       /bin/sh -c "
       until (/usr/bin/mc config host add minio http://minio:9000 minioadmin minioadmin) do echo '...waiting...' && sleep 1; done;
-      /usr/bin/mc rm -r --force minio/datalake;
       /usr/bin/mc mb minio/datalake;
       /usr/bin/mc policy set public minio/datalake;
       exit 0;
@@ -168,6 +169,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    volumes:
+      - postgres-iceberg:/var/lib/postgresql/data
+  
 
   rest:
     image: tabulario/iceberg-rest:1.6.0
@@ -213,10 +217,12 @@ services:
 
   spark-iceberg:
     image: tabulario/spark-iceberg:3.5.5_1.8.1
+    container_name: spark-iceberg
     depends_on:
       - rest
       - minio
     environment:
+      # - SPARK_MASTER_HOST=spark-iceberg
       - AWS_ACCESS_KEY_ID=minioadmin
       - AWS_SECRET_ACCESS_KEY=minioadmin
       - AWS_REGION=us-east-1
@@ -225,6 +231,7 @@ services:
       - "8088:8080"
       - "10000:10000"
       - "10001:10001"
+
 
   postgres-dwh:
     image: postgres:13
@@ -432,4 +439,5 @@ volumes:
   minio-storage:
   minio-config:
   postgres-db-volume_dwh:
+  postgres-iceberg:
 
