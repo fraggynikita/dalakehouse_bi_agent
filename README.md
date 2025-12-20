@@ -13,3 +13,5 @@
 Данные готовы к использованию
 
 ссылка на данные: https://drive.google.com/file/d/1TVyZuOf_ydRLYjw_ZlelPCS-7kRPCO7f/view?usp=drive_link
+
+Необходимо скачать zip архив и разархивировать его в папку dags/raw_data
