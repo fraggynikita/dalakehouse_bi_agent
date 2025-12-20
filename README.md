@@ -9,3 +9,5 @@
 Для формирования витрин в gold - create_gold_dm 
 
 Данные готовы к использованию
+
+ссылка на данные: https://drive.google.com/file/d/1TVyZuOf_ydRLYjw_ZlelPCS-7kRPCO7f/view?usp=drive_link
