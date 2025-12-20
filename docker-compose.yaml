@@ -106,17 +106,17 @@ services:
       start_period: 5s
     restart: always
 
-  clickhouse-server:
-    image: clickhouse/clickhouse-server:24.3.6
-    container_name: clickhouse-server
-    ports:
-        - '8123:8123'
-        - '9005:9000'
-    volumes:
-      - ./data_ch:/var/lib/clickhouse
-      - ./logs_ch:/var/log/clickhouse-server
-      - ./config_ch/users.xml:/etc/clickhouse-server/users.d/my_user.xml
-      - ./config_ch/gigachat_best_llm.txt:/etc/clickhouse-server/users.d/gigachat_best_llm.txt
+  # clickhouse-server:
+  #   image: clickhouse/clickhouse-server:24.3.6
+  #   container_name: clickhouse-server
+  #   ports:
+  #       - '8123:8123'
+  #       - '9005:9000'
+  #   volumes:
+  #     - ./data_ch:/var/lib/clickhouse
+  #     - ./logs_ch:/var/log/clickhouse-server
+  #     - ./config_ch/users.xml:/etc/clickhouse-server/users.d/my_user.xml
+  #     - ./config_ch/gigachat_best_llm.txt:/etc/clickhouse-server/users.d/gigachat_best_llm.txt
 
 
   minio:

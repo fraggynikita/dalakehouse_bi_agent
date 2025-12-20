@@ -10,13 +10,11 @@ from airflow.providers.postgres.hooks.postgres import PostgresHook
 from airflow.operators.python import PythonOperator
 
 
-# =========================
-# НАСТРОЙКИ (ПРАВИШЬ ТОЛЬКО ЭТО)
-# =========================
+
 POSTGRES_CONN_ID = "postgres_dwh"
 
 TARGET_SCHEMA = "test"
-# =========================
+
 
 
 default_args = {"owner": "airflow", "retries": 1}
@@ -25,13 +23,12 @@ def load_table(target_table, csv_path):
     TARGET_TABLE = target_table
     CSV_PATH = csv_path
 
-    # 1) Проверка файла
+
     if not os.path.exists(CSV_PATH):
         raise FileNotFoundError(f"CSV not found: {CSV_PATH}")
 
     hook = PostgresHook(postgres_conn_id=POSTGRES_CONN_ID)
 
-    # 2) Проверка, что таблица существует
     exists = hook.get_first(
         """
         SELECT 1
@@ -45,10 +42,8 @@ def load_table(target_table, csv_path):
             f"Target table does not exist: {TARGET_SCHEMA}.{TARGET_TABLE}"
         )
 
-    # 3) TRUNCATE перед загрузкой
     hook.run(f"TRUNCATE TABLE {TARGET_SCHEMA}.{TARGET_TABLE};")
 
-    # 4) COPY FROM STDIN (САМЫЙ БЫСТРЫЙ СПОСОБ)
     conn = hook.get_conn()
     conn.autocommit = True
 

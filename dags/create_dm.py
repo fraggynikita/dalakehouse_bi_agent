@@ -10,7 +10,6 @@ with DAG(
     tags=["gold", "trino", "iceberg", "games", "dm"],
 ) as dag:
 
-    # 1. Создание схемы gold
     create_gold_schema = SQLExecuteQueryOperator(
         task_id="create_gold_schema",
         conn_id="trino_def",
@@ -21,7 +20,6 @@ with DAG(
         do_xcom_push=False,
     )
 
-    # 2) Инициализируем таблицу витрины (как на изображении)
     create_dm_market_games_overview = SQLExecuteQueryOperator(
         task_id="create_dm_market_games_overview",
         conn_id="trino_def",
@@ -80,7 +78,6 @@ with DAG(
         do_xcom_push=False,
     )
 
-    # 3. Создание витрины (CTAS)
     insert_dm_market_games_overview = SQLExecuteQueryOperator(
         task_id="insert_dm_market_games_overview",
         conn_id="trino_def",

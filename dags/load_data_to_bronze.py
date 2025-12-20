@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 # from airflow.providers.standard.operators.bash import BashOperator
 
-SPARK_CONN_ID = "spark_default"  # настроенный в Airflow Spark-коннект
+SPARK_CONN_ID = "spark_default"   
 MASTER_URL = "spark://spark-iceberg:7077"
 
 JDBC_URL = "jdbc:postgresql://postgres-dwh:5432/dwh"
@@ -13,8 +13,6 @@ JDBC_PASSWORD = "dwh"
 ICEBERG_CATALOG = "iceberg"
 ICEBERG_NAMESPACE = "datalake"
 
-# ✅ Вариант B: Iceberg runtime + Iceberg AWS bundle + Postgres
-# Iceberg AWS bundle тянет нужные зависимости AWS SDK (включая sts) согласованных версий.
 PACKAGES = ",".join([
     "org.apache.iceberg:iceberg-spark-runtime-3.5_2.12:1.6.0",
     "org.apache.iceberg:iceberg-aws-bundle:1.6.0",
@@ -51,7 +49,6 @@ SPARK_CONF = {
     "spark.hadoop.fs.s3a.connection.ssl.enabled": "false",
     "spark.hadoop.fs.s3a.endpoint.region": "us-east-1",
 
-    # ✅ ВОТ ОН, ФИКС: регион для AWS SDK v2 на driver и executor
     "spark.driver.extraJavaOptions": "-Daws.region=us-east-1 -Daws.defaultRegion=us-east-1",
     "spark.executor.extraJavaOptions": "-Daws.region=us-east-1 -Daws.defaultRegion=us-east-1",
 }
@@ -76,8 +73,8 @@ with DAG(
         application_args=[
             JDBC_URL, JDBC_USER, JDBC_PASSWORD,
             ICEBERG_CATALOG, ICEBERG_NAMESPACE,
-            "dwh.test.games_list",  # источник
-            "games_list"            # целевая таблица
+            "dwh.test.games_list",  
+            "games_list"            
         ],
     )
 
